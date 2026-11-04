@@ -88,7 +88,6 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
-    /* Print View Styling */
     @media print {
       body { background-color: #ffffff !important; color: #000000 !important; }
       .no-print { display: none !important; }
@@ -103,24 +102,22 @@
 </head>
 <body class="p-3 md:p-6">
 
-  <!-- LAYAR LOADING HITAM (PRELOADER SCREEN WITH ANIMATED PROGRESS BAR) -->
+  <!-- PRELOADER SCREEN -->
   <div id="preloader" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#070a12] transition-opacity duration-300">
     <div class="text-center max-w-xs w-full px-6 space-y-6">
       <div class="inline-flex items-center justify-center px-8 py-3 rounded-2xl bg-teal-500/10 border border-teal-500/30 shadow-[0_0_25px_rgba(0,255,170,0.2)] animate-pulse">
         <span class="text-3xl font-black italic tracking-widest text-emerald-400 drop-shadow-[0_0_12px_rgba(0,255,170,0.5)]">JKIND</span>
       </div>
-      
       <div>
         <h2 class="text-xl font-bold text-white tracking-wider">REJECT PDI SYSTEM</h2>
         <p id="preloaderStatusText" class="text-xs text-gray-400 mt-1 font-mono">Memuat Sistem Inspection...</p>
       </div>
-
       <div class="w-full space-y-2">
         <div class="w-full h-2.5 bg-slate-900 rounded-full p-0.5 border border-teal-500/30 overflow-hidden shadow-[0_0_10px_rgba(0,0,0,0.5)]">
           <div id="preloaderProgressBar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full transition-all duration-200 shadow-[0_0_12px_rgba(0,255,170,0.8)]" style="width: 15%;"></div>
         </div>
         <div class="flex justify-between items-center text-[10px] text-gray-400 font-mono">
-          <span>FAST ENGINE ACTIVE</span>
+          <span>SECURE ENGINE</span>
           <span id="preloaderPercentage" class="text-emerald-400 font-bold">15%</span>
         </div>
       </div>
@@ -175,7 +172,6 @@
       </div>
     </div>
 
-    <!-- Active User Profile Bar -->
     <div id="userProfileBar" class="hidden flex items-center gap-3">
       <button onclick="openApiConfigModal()" title="Cek/Setting URL API" class="p-2 text-gray-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors">
         <i class="fa-solid fa-gear text-base"></i>
@@ -209,17 +205,19 @@
     </button>
   </nav>
 
-  <!-- CONTENT 1: FORM INPUT REJECT -->
+  <!-- CONTENT 1: FORM INPUT REJECT (SUPPORT EDIT & CREATE) -->
   <section id="tab-input" class="tab-content max-w-4xl mx-auto">
     <div class="glass-card rounded-2xl p-5 md:p-8">
       <div class="flex items-center justify-between pb-4 mb-6 border-b border-gray-800">
-        <h2 class="text-base md:text-lg font-bold text-white flex items-center gap-2">
+        <h2 id="formTitleText" class="text-base md:text-lg font-bold text-white flex items-center gap-2">
           <i class="fa-solid fa-circle-plus text-emerald-400"></i> Form Catat Temuan Reject Kaca
         </h2>
-        <span class="text-xs text-gray-400 italic">Auto-ID Sekuensial</span>
+        <button id="btnCancelEdit" onclick="resetFormMode()" class="hidden text-xs text-amber-400 hover:text-amber-300 underline">Batal Edit</button>
       </div>
 
       <form id="rejectForm" onsubmit="submitFormReject(event)" class="space-y-5">
+        <input type="hidden" id="editTransactionId" value="">
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/50 p-4 rounded-xl border border-gray-800">
           <div>
             <label class="block text-xs text-gray-400 mb-1">Nama MP PDI (Terkunci)</label>
@@ -306,7 +304,7 @@
           </select>
         </div>
 
-        <!-- KLAIM KACA (MULTI CHECKBOXES) -->
+        <!-- KLAIM KACA -->
         <div>
           <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
             Klaim Kaca (Bisa pilih lebih dari 1) <span class="text-rose-500">*</span>
@@ -345,7 +343,7 @@
           </div>
         </div>
 
-        <!-- KLAIM REJECT (MULTI CHECKBOXES) -->
+        <!-- KLAIM REJECT -->
         <div>
           <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
             Klaim Reject (Bisa pilih lebih dari 1) <span class="text-rose-500">*</span>
@@ -398,7 +396,7 @@
         <div class="pt-4">
           <button type="submit" id="btnSubmitForm" class="w-full py-4 rounded-xl btn-neon flex items-center justify-center gap-2 text-base">
             <i class="fa-solid fa-floppy-disk"></i>
-            <span>SIMPAN DATA REJECT PDI</span>
+            <span id="btnSubmitText">SIMPAN DATA REJECT PDI</span>
           </button>
         </div>
       </form>
@@ -458,7 +456,7 @@
     </div>
   </section>
 
-  <!-- CONTENT 3: RIWAYAT DAN MONITORING -->
+  <!-- CONTENT 3: RIWAYAT & MONITORING (DENGAN TOMBOL EDIT & HAPUS) -->
   <section id="tab-history" class="tab-content hidden max-w-6xl mx-auto space-y-4">
     <div class="glass-card rounded-2xl p-5">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -512,10 +510,11 @@
               <th class="p-3">Klaim Kaca</th>
               <th class="p-3">Klaim Reject</th>
               <th class="p-3">Action</th>
+              <th class="p-3 text-center">Opsi Koreksi</th>
             </tr>
           </thead>
           <tbody id="historyTableBody" class="divide-y divide-gray-800/60">
-            <!-- Table rows populated dynamically via JS -->
+            <!-- Populated via JS -->
           </tbody>
         </table>
       </div>
@@ -534,7 +533,7 @@
     </div>
   </section>
 
-  <!-- CONTENT 4: EXPORT LAPORAN INSPECTION -->
+  <!-- CONTENT 4: EXPORT LAPORAN -->
   <section id="tab-export" class="tab-content hidden max-w-4xl mx-auto">
     <div class="glass-card rounded-2xl p-6 space-y-6">
       <div class="border-b border-gray-800 pb-4">
@@ -577,7 +576,7 @@
     </div>
   </section>
 
-  <!-- PRINT-ONLY VIEW SECTION FOR PDF -->
+  <!-- PRINT VIEW -->
   <div class="print-only p-4">
     <div style="text-align: center; margin-bottom: 20px;">
       <h2 style="font-size: 16pt; font-weight: bold; margin: 0;">LAPORAN INSPECTION REJECT KACA (PDI)</h2>
@@ -609,7 +608,7 @@
     </div>
   </div>
 
-  <!-- MODAL OPTIONAL SETTING API URL -->
+  <!-- API CONFIG MODAL -->
   <div id="apiConfigModal" class="fixed inset-0 z-[90] hidden flex items-center justify-center bg-black/85 p-4 no-print">
     <div class="glass-card w-full max-w-md p-6 rounded-2xl relative space-y-4">
       <button onclick="closeApiConfigModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
@@ -662,12 +661,9 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT FRONTEND LOGIC (HIGH PERFORMANCE OPTIMIZED) -->
+  <!-- JAVASCRIPT LOGIC (DENGAN SESSION TIMEOUT, EDIT/DELETE, & OFFLINE QUEUE) -->
   <script>
-    // =========================================================================
-    // TEMPELKAN URL DEPLOYMENT WEB APP GOOGLE APPS SCRIPT PADA BARIS DI BAWAH
-    // =========================================================================
-    var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbyp7wCyj8PwWDixuZEVFXPzSROHdKjU5taFjWHP10zBYzfbONbMtgnZpoqHyIsMDgVSSA/exec";
+    var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzmUlyn3P2rfwHIRkfym8SXu8Jt0RWuQQuUMHvTPz0h6TkPLHSuxmmzN7J4vy5GcosL8w/exec";
 
     var currentUser = { mpName: '', shift: '' };
     var currentPage = 1;
@@ -675,6 +671,7 @@
     var searchTimer = null;
     var html5QrcodeScanner = null;
     var customConfirmCallback = null;
+    var currentEditingId = null;
 
     function updatePreloader(percentage, statusText) {
       var pBar = document.getElementById('preloaderProgressBar');
@@ -714,13 +711,51 @@
 
       fetch(fullUrl, { method: 'GET', mode: 'cors' })
       .then(function(res) { return res.json(); })
-      .then(function(data) { if (successCb) successCb(data); })
+      .then(function(data) { 
+        if (successCb) successCb(data); 
+        processOfflineQueue(); // Coba sinkronkan antrean offline jika online
+      })
       .catch(function(err) {
         console.error('API Error:', err);
         updatePreloader(100, 'Koneksi Selesai');
         if (failureCb) failureCb(err);
-        else showCustomAlert('KONEKSI API GAGAL', 'Gagal terhubung ke Google Sheets API. Pastikan URL Web App benar dan "Who has access" adalah "Anyone".', 'danger');
+        else {
+          // Point 5: Jika offline / gagal, simpan ke antrean lokal jika aksi simpan
+          if (action === 'saveRejectData') {
+            saveToOfflineQueue(payload);
+          } else {
+            showCustomAlert('KONEKSI API GAGAL', 'Gagal terhubung ke Google Sheets API. Pastikan URL Web App benar dan "Who has access" adalah "Anyone".', 'danger');
+          }
+        }
       });
+    }
+
+    // Point 5: Offline Queue Management
+    function saveToOfflineQueue(payload) {
+      var queue = JSON.parse(localStorage.getItem('pdi_offline_queue') || '[]');
+      queue.push(payload);
+      localStorage.setItem('pdi_offline_queue', JSON.stringify(queue));
+      showCustomAlert('TERSIMPAN OFFLINE', 'Koneksi terputus. Data disimpan di antrean lokal perangkat dan akan dikirim otomatis saat terhubung kembali.', 'warning');
+    }
+
+    function processOfflineQueue() {
+      var queue = JSON.parse(localStorage.getItem('pdi_offline_queue') || '[]');
+      if (queue.length === 0) return;
+
+      var nextPayload = queue.shift();
+      var apiUrl = getApiUrl();
+      var fullUrl = apiUrl + '?action=saveRejectData&payload=' + encodeURIComponent(JSON.stringify(nextPayload));
+
+      fetch(fullUrl, { method: 'GET', mode: 'cors' })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.success) {
+          localStorage.setItem('pdi_offline_queue', JSON.stringify(queue));
+          console.log('Antrean offline berhasil disinkronkan.');
+          if (queue.length > 0) processOfflineQueue(); // Lanjut sinkronisasi berikutnya
+          else loadInitialAppData();
+        }
+      }).catch(function() {});
     }
 
     function openApiConfigModal() {
@@ -789,7 +824,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      updatePreloader(30, 'Memuat Cache Lokal Instan...');
+      updatePreloader(30, 'Memuat Cache Lokal...');
       setDefaultDateAndTime();
       loadCachedData();
       checkLoginSession();
@@ -813,19 +848,28 @@
       if (jamInput && !jamInput.value) jamInput.value = timeStr;
     }
 
+    // Point 2: Manajemen Sesi & Auto-Timeout (12 Jam)
     function checkLoginSession() {
       var savedSession = localStorage.getItem('pdi_user_session');
-      if (savedSession) {
-        try {
-          currentUser = JSON.parse(savedSession);
-          if (currentUser.mpName && currentUser.shift) {
-            updatePreloader(60, 'Memulihkan Sesi Pengguna...');
-            applySessionToUI();
-            return;
-          }
-        } catch (e) {}
+      var sessionTime = localStorage.getItem('pdi_session_time');
+      var now = new Date().getTime();
+
+      if (savedSession && sessionTime) {
+        var hoursElapsed = (now - parseInt(sessionTime, 10)) / (1000 * 60 * 60);
+        if (hoursElapsed < 12) {
+          try {
+            currentUser = JSON.parse(savedSession);
+            if (currentUser.mpName && currentUser.shift) {
+              updatePreloader(60, 'Memulihkan Sesi Pengguna...');
+              applySessionToUI();
+              return;
+            }
+          } catch (e) {}
+        }
       }
-      updatePreloader(100, 'Autentikasi Diperlukan');
+      localStorage.removeItem('pdi_user_session');
+      localStorage.removeItem('pdi_session_time');
+      updatePreloader(100, 'Sesi Berakhir / Autentikasi Diperlukan');
       showLoginModal();
     }
 
@@ -845,6 +889,7 @@
 
       currentUser = { mpName: mpName, shift: shift };
       localStorage.setItem('pdi_user_session', JSON.stringify(currentUser));
+      localStorage.setItem('pdi_session_time', new Date().getTime().toString());
       
       updatePreloader(20, 'Memulai Sesi PDI...');
       document.getElementById('preloader').style.display = 'flex';
@@ -864,6 +909,7 @@
 
       updatePreloader(85, 'Sinkronisasi Cloud Sheets...');
       loadInitialAppData();
+      processOfflineQueue();
     }
 
     function loadCachedData() {
@@ -906,6 +952,7 @@
     function handleLogout() {
       showCustomConfirm('KONFIRMASI LOGOUT', 'Apakah Anda yakin ingin keluar dari sesi pengguna ini?', function() {
         localStorage.removeItem('pdi_user_session');
+        localStorage.removeItem('pdi_session_time');
         currentUser = { mpName: '', shift: '' };
         document.getElementById('userProfileBar').classList.add('hidden');
         showLoginModal();
@@ -947,9 +994,11 @@
       else if (tabName === 'history') loadHistoryData(currentPage);
     }
 
+    // Point 4: Simpan Data (Create atau Update / Edit)
     function submitFormReject(e) {
       e.preventDefault();
       var btnSubmit = document.getElementById('btnSubmitForm');
+      var editId = document.getElementById('editTransactionId').value;
       
       var kacaCheckboxes = document.querySelectorAll('input[name="klaimKaca"]:checked');
       var kacaArr = [];
@@ -980,9 +1029,11 @@
       var klaimRejectVal = rejectArr.join(', ');
 
       btnSubmit.disabled = true;
-      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN DATA...';
+      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN...';
 
+      var actionType = editId ? 'updateRejectData' : 'saveRejectData';
       var payload = {
+        id: editId,
         mpName: currentUser.mpName,
         shift: currentUser.shift,
         namaQc: document.getElementById('namaQc').value.trim(),
@@ -996,55 +1047,127 @@
         action: document.getElementById('action').value
       };
 
-      callGasApi('saveRejectData', payload, function(res) {
+      callGasApi(actionType, payload, function(res) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> SIMPAN DATA REJECT PDI';
+        btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span id="btnSubmitText">SIMPAN DATA REJECT PDI</span>';
 
         if (res && res.success) {
-          showCustomAlert('BERHASIL DISIMPAN', 'Data Reject PDI berhasil disimpan. ID: ' + res.data.id, 'success');
-          
-          document.getElementById('namaQc').value = '';
-          document.getElementById('team').value = '';
-          document.getElementById('noRangka').value = '';
-          document.getElementById('jenisMobil').value = '';
-          document.getElementById('action').value = '';
-          
-          var allCbs = document.querySelectorAll('input[name="klaimKaca"], input[name="klaimReject"]');
-          for (var c = 0; c < allCbs.length; c++) { allCbs[c].checked = false; }
-          document.getElementById('klaimRejectLainnya').value = '';
-          document.getElementById('containerKlaimRejectLainnya').classList.add('hidden');
-          
-          setDefaultDateAndTime();
+          showCustomAlert('BERHASIL', res.message, 'success');
+          resetFormMode();
           loadInitialAppData();
         } else {
-          showCustomAlert('GAGAL DISIMPAN', (res ? res.message : 'Unknown error'), 'danger');
+          showCustomAlert('GAGAL', (res ? res.message : 'Unknown error'), 'danger');
         }
       }, function(err) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> SIMPAN DATA REJECT PDI';
-        showCustomAlert('SERVER ERROR', err.toString(), 'danger');
+        btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span id="btnSubmitText">SIMPAN DATA REJECT PDI</span>';
+        if (!editId) saveToOfflineQueue(payload);
+      });
+    }
+
+    function resetFormMode() {
+      document.getElementById('editTransactionId').value = '';
+      document.getElementById('formTitleText').innerHTML = '<i class="fa-solid fa-circle-plus text-emerald-400"></i> Form Catat Temuan Reject Kaca';
+      document.getElementById('btnCancelEdit').classList.add('hidden');
+      document.getElementById('btnSubmitText').textContent = 'SIMPAN DATA REJECT PDI';
+      
+      document.getElementById('namaQc').value = '';
+      document.getElementById('team').value = '';
+      document.getElementById('noRangka').value = '';
+      document.getElementById('jenisMobil').value = '';
+      document.getElementById('action').value = '';
+      
+      var allCbs = document.querySelectorAll('input[name="klaimKaca"], input[name="klaimReject"]');
+      for (var c = 0; c < allCbs.length; c++) { allCbs[c].checked = false; }
+      document.getElementById('klaimRejectLainnya').value = '';
+      document.getElementById('containerKlaimRejectLainnya').classList.add('hidden');
+      setDefaultDateAndTime();
+    }
+
+    // Point 4: Edit Record Trigger
+    function editRecord(itemStr) {
+      try {
+        var item = JSON.parse(decodeURIComponent(itemStr));
+        document.getElementById('editTransactionId').value = item.id;
+        document.getElementById('formTitleText').innerHTML = '<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Data Reject: <span class="text-amber-300 font-mono">' + item.id + '</span>';
+        document.getElementById('btnCancelEdit').classList.remove('hidden');
+        document.getElementById('btnSubmitText').textContent = 'PERBARUI DATA REJECT';
+
+        document.getElementById('namaQc').value = item.namaQc || '';
+        document.getElementById('team').value = item.team || '';
+        document.getElementById('tanggalPemasangan').value = item.tanggalPemasangan || '';
+        document.getElementById('jamPemasangan').value = item.jamPemasangan || '';
+        document.getElementById('noRangka').value = item.noRangka || '';
+        document.getElementById('jenisMobil').value = item.jenisMobil || '';
+        document.getElementById('action').value = item.action || '';
+
+        // Check boxes klaim kaca
+        var kacaItems = (item.klaimKaca || '').split(',').map(function(s) { return s.trim(); });
+        var kacaCbs = document.querySelectorAll('input[name="klaimKaca"]');
+        for (var i = 0; i < kacaCbs.length; i++) {
+          kacaCbs[i].checked = kacaItems.indexOf(kacaCbs[i].value) !== -1;
+        }
+
+        // Check boxes klaim reject
+        var rejectItems = (item.klaimReject || '').split(',').map(function(s) { return s.trim(); });
+        var rejectCbs = document.querySelectorAll('input[name="klaimReject"]');
+        var standardRejects = ['Patah','Bintik','Cacing','Renyek','Kelupas','Sisa Air/Bubble','Gelembung','Bolong/Ngongkong'];
+        var otherRejectFound = '';
+
+        for (var j = 0; j < rejectCbs.length; j++) {
+          if (rejectCbs[j].value !== 'Lainnya') {
+            rejectCbs[j].checked = rejectItems.indexOf(rejectCbs[j].value) !== -1;
+          }
+        }
+
+        for (var r = 0; r < rejectItems.length; r++) {
+          if (standardRejects.indexOf(rejectItems[r]) === -1 && rejectItems[r]) {
+            otherRejectFound = rejectItems[r];
+            break;
+          }
+        }
+
+        var cbLainnya = document.querySelector('input[name="klaimReject"][value="Lainnya"]');
+        if (otherRejectFound) {
+          if (cbLainnya) cbLainnya.checked = true;
+          document.getElementById('containerKlaimRejectLainnya').classList.remove('hidden');
+          document.getElementById('klaimRejectLainnya').value = otherRejectFound;
+          document.getElementById('klaimRejectLainnya').required = true;
+        } else {
+          if (cbLainnya) cbLainnya.checked = false;
+          document.getElementById('containerKlaimRejectLainnya').classList.add('hidden');
+        }
+
+        switchTab('input');
+      } catch (err) {
+        console.error('Error parsing edit item:', err);
+      }
+    }
+
+    // Point 4: Delete Record Trigger
+    function deleteRecord(id) {
+      showCustomConfirm('HAPUS DATA', 'Apakah Anda yakin ingin menghapus transaksi ' + id + '?', function() {
+        callGasApi('deleteRejectData', { id: id }, function(res) {
+          if (res && res.success) {
+            showCustomAlert('BERHASIL', res.message, 'success');
+            loadInitialAppData();
+          } else {
+            showCustomAlert('GAGAL', res ? res.message : 'Gagal menghapus', 'danger');
+          }
+        });
       });
     }
 
     function openBarcodeScanner() {
       document.getElementById('barcodeModal').classList.remove('hidden');
-      
       if (typeof Html5Qrcode !== 'undefined') {
         html5QrcodeScanner = new Html5Qrcode("reader");
         var config = { fps: 15, qrbox: { width: 250, height: 150 } };
-        
-        html5QrcodeScanner.start(
-          { facingMode: "environment" },
-          config,
-          onScanSuccess
-        ).catch(function(err) {
-          console.error("Camera access failed: ", err);
-          showCustomAlert('AKSES KAMERA GAGAL', 'Gagal membuka kamera HP. Pastikan izin kamera telah diberikan.', 'danger');
+        html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
+        .catch(function(err) {
+          showCustomAlert('AKSES KAMERA GAGAL', 'Gagal membuka kamera HP.', 'danger');
           closeBarcodeScanner();
         });
-      } else {
-        showCustomAlert('SCANNER UNREADY', 'Library Scanner Barcode belum siap. Gunakan input manual.', 'warning');
-        closeBarcodeScanner();
       }
     }
 
@@ -1094,7 +1217,7 @@
       tbody.innerHTML = '';
 
       if (!res || !res.items || res.items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" class="p-6 text-center text-gray-500 italic">Tidak ada data transaksi reject ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" class="p-6 text-center text-gray-500 italic">Tidak ada data transaksi reject ditemukan.</td></tr>';
         document.getElementById('pageInfoText').textContent = 'Halaman 1 dari 1 (0 Data)';
         document.getElementById('btnPrevPage').disabled = true;
         document.getElementById('btnNextPage').disabled = true;
@@ -1110,6 +1233,7 @@
       for (var i = 0; i < res.items.length; i++) {
         var item = res.items[i];
         var actionClass = (item.action === 'Ganti') ? 'badge-ganti' : 'badge-repair';
+        var encodedItem = encodeURIComponent(JSON.stringify(item));
         
         htmlArray.push(
           '<tr class="hover:bg-slate-800/50 transition-colors">' +
@@ -1125,10 +1249,13 @@
           '<td class="p-3 text-xs text-amber-300 font-medium">' + escapeHtml(item.klaimKaca) + '</td>' +
           '<td class="p-3 text-xs text-rose-300 font-medium">' + escapeHtml(item.klaimReject) + '</td>' +
           '<td class="p-3 text-xs"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ' + actionClass + '">' + escapeHtml(item.action) + '</span></td>' +
+          '<td class="p-3 text-center space-x-1 whitespace-nowrap">' +
+            '<button onclick="editRecord(\'' + encodedItem + '\')" title="Edit Data" class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 text-[10px] font-bold"><i class="fa-solid fa-pen"></i></button>' +
+            '<button onclick="deleteRecord(\'' + escapeHtml(item.id) + '\')" title="Hapus Data" class="px-2 py-1 rounded bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 text-[10px] font-bold"><i class="fa-solid fa-trash"></i></button>' +
+          '</td>' +
           '</tr>'
         );
       }
-
       tbody.innerHTML = htmlArray.join('');
     }
 
@@ -1146,7 +1273,6 @@
 
     function renderDashboard(data) {
       if (!data) return;
-
       var displayWorkDate = data.workDateFormatted || new Date().toISOString().split('T')[0];
       document.getElementById('statToday').textContent = data.totalToday || 0;
       document.getElementById('statTotalAllTime').textContent = data.totalAllTime || 0;
@@ -1170,7 +1296,6 @@
 
       var kacaContainer = document.getElementById('topKacaContainer');
       kacaContainer.innerHTML = '';
-      
       if (!data.topKlaimKaca || data.topKlaimKaca.length === 0) {
         kacaContainer.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada data reject kaca.</p>';
       } else {
@@ -1179,7 +1304,6 @@
         for (var i = 0; i < data.topKlaimKaca.length; i++) {
           var item = data.topKlaimKaca[i];
           var pct = Math.round((item.count / maxCount) * 100);
-          
           htmlKacaArray.push(
             '<div><div class="flex justify-between text-xs mb-1">' +
             '<span class="font-semibold text-gray-200">#' + (i+1) + ' ' + escapeHtml(item.name) + '</span>' +
@@ -1193,7 +1317,6 @@
 
       var shiftContainer = document.getElementById('shiftStatsContainer');
       shiftContainer.innerHTML = '';
-
       if (!data.shiftStats || data.shiftStats.length === 0) {
         shiftContainer.innerHTML = '<p class="text-xs text-gray-500 italic">Belum ada data shift hari ini.</p>';
       } else {
@@ -1212,7 +1335,6 @@
       }
     }
 
-    // EXPORT LAPORAN FORMAL EXCEL (.XLSX) WITH SHEETJS
     function downloadExcelReport() {
       var params = {
         dateStart: document.getElementById('exportDateStart').value,
@@ -1227,86 +1349,42 @@
         }
 
         if (typeof XLSX === 'undefined') {
-          showCustomAlert('LIBRARY UNREADY', 'Library Excel SheetJS belum siap. Periksa koneksi internet.', 'danger');
+          showCustomAlert('LIBRARY UNREADY', 'Library Excel SheetJS belum siap.', 'danger');
           return;
         }
 
-        // 1. Buat Header Laporan Formal
         var excelData = [
           ["LAPORAN TEMUAN REJECT GLASS FILM - PDI (PRE-DELIVERY INSPECTION)"],
           ["JKIND - QUALITY CONTROL CONTROL SYSTEM"],
           ["Tanggal Cetak: " + new Date().toLocaleString('id-ID')],
           ["Filter Tanggal: " + (params.dateStart || 'Semua') + " s/d " + (params.dateEnd || 'Semua') + " | Shift: " + (params.shift || 'Semua Shift')],
-          [] // Baris Kosong Pemisah
+          []
         ];
 
-        // 2. Baris Header Tabel Formal
         excelData.push([
-          "NO",
-          "ID TRANSAKSI",
-          "TANGGAL",
-          "WAKTU",
-          "NAMA MP PDI",
-          "SHIFT",
-          "NAMA QC",
-          "TGL PASANG",
-          "JAM PASANG",
-          "TEAM",
-          "NO RANGKA",
-          "JENIS MOBIL",
-          "KLAIM KACA",
-          "KLAIM REJECT",
-          "ACTION"
+          "NO", "ID TRANSAKSI", "TANGGAL", "WAKTU", "NAMA MP PDI", "SHIFT",
+          "NAMA QC", "TGL PASANG", "JAM PASANG", "TEAM", "NO RANGKA",
+          "JENIS MOBIL", "KLAIM KACA", "KLAIM REJECT", "ACTION"
         ]);
 
-        // 3. Masukkan Data Baris
         for (var i = 0; i < res.items.length; i++) {
           var r = res.items[i];
           excelData.push([
-            i + 1,
-            r.id,
-            r.tanggal,
-            r.waktu,
-            r.mpName,
-            r.shift,
-            r.namaQc,
-            r.tanggalPemasangan,
-            r.jamPemasangan,
-            r.team,
-            r.noRangka,
-            r.jenisMobil,
-            r.klaimKaca,
-            r.klaimReject,
-            r.action
+            i + 1, r.id, r.tanggal, r.waktu, r.mpName, r.shift,
+            r.namaQc, r.tanggalPemasangan, r.jamPemasangan, r.team, r.noRangka,
+            r.jenisMobil, r.klaimKaca, r.klaimReject, r.action
           ]);
         }
 
-        // 4. Generate Worksheet & Workbook
         var ws = XLSX.utils.aoa_to_sheet(excelData);
-
-        // Atur Lebar Kolom Otomatis (Autofit Columns)
         ws['!cols'] = [
-          { wch: 5 },  // NO
-          { wch: 22 }, // ID TRANSAKSI
-          { wch: 14 }, // TANGGAL
-          { wch: 10 }, // WAKTU
-          { wch: 20 }, // NAMA MP PDI
-          { wch: 10 }, // SHIFT
-          { wch: 16 }, // NAMA QC
-          { wch: 14 }, // TGL PASANG
-          { wch: 12 }, // JAM PASANG
-          { wch: 8 },  // TEAM
-          { wch: 22 }, // NO RANGKA
-          { wch: 16 }, // JENIS MOBIL
-          { wch: 25 }, // KLAIM KACA
-          { wch: 25 }, // KLAIM REJECT
-          { wch: 12 }  // ACTION
+          { wch: 5 }, { wch: 22 }, { wch: 14 }, { wch: 10 }, { wch: 20 },
+          { wch: 10 }, { wch: 16 }, { wch: 14 }, { wch: 12 }, { wch: 8 },
+          { wch: 22 }, { wch: 16 }, { wch: 25 }, { wch: 25 }, { wch: 12 }
         ];
 
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Laporan_Reject_PDI");
-
-        // 5. Unduh File Excel (.xlsx)
         var fileName = "Laporan_Reject_PDI_GlassFilm_" + new Date().toISOString().split('T')[0] + ".xlsx";
         XLSX.writeFile(wb, fileName);
       });
